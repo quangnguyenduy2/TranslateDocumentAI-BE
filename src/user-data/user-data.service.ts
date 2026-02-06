@@ -25,6 +25,10 @@ export class UserDataService {
     private preferenceRepo: Repository<UserPreference>,
     @InjectRepository(DefaultGlossary)
     private defaultGlossaryRepo: Repository<DefaultGlossary>,
+    @InjectRepository(DefaultBlacklist)
+    private defaultBlacklistRepo: Repository<DefaultBlacklist>,
+  ) {}
+
   // Glossary Methods
   async getGlossary(userId: string): Promise<any[]> {
     // Get default glossary (applies to all users)
@@ -49,6 +53,30 @@ export class UserDataService {
       })),
       ...userItems.map(u => ({ 
         id: u.id, 
+        term: u.term, 
+        translation: u.translation,
+        isDefault: false 
+      }))
+    ];
+    
+    return merged;
+  }
+
+  async saveGlossary(userId: string, items: CreateGlossaryDto[]): Promise<GlossaryItem[]> {
+    await this.glossaryRepo.delete({ userId });
+    const newItems = items.map(item => this.glossaryRepo.create({ ...item, userId }));
+    return this.glossaryRepo.save(newItems);
+  }
+
+  async addGlossaryItem(userId: string, dto: CreateGlossaryDto): Promise<GlossaryItem> {
+    const item = this.glossaryRepo.create({ ...dto, userId });
+    return this.glossaryRepo.save(item);
+  }
+
+  async deleteGlossaryItem(userId: string, id: string): Promise<void> {
+    await this.glossaryRepo.delete({ id, userId });
+  }
+
   // Blacklist Methods
   async getBlacklist(userId: string): Promise<any[]> {
     // Get default blacklist (applies to all users)
@@ -82,34 +110,6 @@ export class UserDataService {
     ];
     
     return merged;
-  }   }))
-    ];
-    
-    return merged;
-  }
-  // Glossary Methods
-  async getGlossary(userId: string): Promise<GlossaryItem[]> {
-    return this.glossaryRepo.find({ where: { userId }, order: { createdAt: 'DESC' } });
-  }
-
-  async saveGlossary(userId: string, items: CreateGlossaryDto[]): Promise<GlossaryItem[]> {
-    await this.glossaryRepo.delete({ userId });
-    const newItems = items.map(item => this.glossaryRepo.create({ ...item, userId }));
-    return this.glossaryRepo.save(newItems);
-  }
-
-  async addGlossaryItem(userId: string, dto: CreateGlossaryDto): Promise<GlossaryItem> {
-    const item = this.glossaryRepo.create({ ...dto, userId });
-    return this.glossaryRepo.save(item);
-  }
-
-  async deleteGlossaryItem(userId: string, id: string): Promise<void> {
-    await this.glossaryRepo.delete({ id, userId });
-  }
-
-  // Blacklist Methods
-  async getBlacklist(userId: string): Promise<BlacklistItem[]> {
-    return this.blacklistRepo.find({ where: { userId }, order: { createdAt: 'DESC' } });
   }
 
   async saveBlacklist(userId: string, items: CreateBlacklistDto[]): Promise<BlacklistItem[]> {
