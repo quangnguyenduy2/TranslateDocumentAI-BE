@@ -41,6 +41,11 @@ export class AdminService {
     if (result.affected === 0) throw new NotFoundException('Default glossary item not found');
   }
 
+  async batchAddDefaultGlossary(dtos: CreateDefaultGlossaryDto[]): Promise<DefaultGlossary[]> {
+    const items = this.defaultGlossaryRepository.create(dtos);
+    return this.defaultGlossaryRepository.save(items);
+  }
+
   // ===== DEFAULT BLACKLIST =====
   async getDefaultBlacklist(): Promise<DefaultBlacklist[]> {
     return this.defaultBlacklistRepository.find({ order: { createdAt: 'DESC' } });
@@ -62,6 +67,11 @@ export class AdminService {
   async deleteDefaultBlacklist(id: string): Promise<void> {
     const result = await this.defaultBlacklistRepository.delete(id);
     if (result.affected === 0) throw new NotFoundException('Default blacklist item not found');
+  }
+
+  async batchAddDefaultBlacklist(dtos: CreateDefaultBlacklistDto[]): Promise<DefaultBlacklist[]> {
+    const items = this.defaultBlacklistRepository.create(dtos);
+    return this.defaultBlacklistRepository.save(items);
   }
 
   // ===== USER MANAGEMENT =====

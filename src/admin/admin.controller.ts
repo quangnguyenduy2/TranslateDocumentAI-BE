@@ -7,7 +7,7 @@ import { CreateDefaultGlossaryDto, UpdateDefaultGlossaryDto } from './dto/defaul
 import { CreateDefaultBlacklistDto, UpdateDefaultBlacklistDto } from './dto/default-blacklist.dto';
 import { ChangeUserRoleDto } from './dto/user-management.dto';
 
-@Controller('api/admin')
+@Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
 export class AdminController {
@@ -35,6 +35,11 @@ export class AdminController {
     return { message: 'Deleted successfully' };
   }
 
+  @Post('default-glossary/batch')
+  async batchAddDefaultGlossary(@Body() dtos: CreateDefaultGlossaryDto[]) {
+    return this.adminService.batchAddDefaultGlossary(dtos);
+  }
+
   // ===== DEFAULT BLACKLIST =====
   @Get('default-blacklist')
   async getDefaultBlacklist() {
@@ -55,6 +60,11 @@ export class AdminController {
   async deleteDefaultBlacklist(@Param('id') id: string) {
     await this.adminService.deleteDefaultBlacklist(id);
     return { message: 'Deleted successfully' };
+  }
+
+  @Post('default-blacklist/batch')
+  async batchAddDefaultBlacklist(@Body() dtos: CreateDefaultBlacklistDto[]) {
+    return this.adminService.batchAddDefaultBlacklist(dtos);
   }
 
   // ===== USER MANAGEMENT =====
