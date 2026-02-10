@@ -12,19 +12,31 @@ async function bootstrap() {
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
   // Enable CORS with credentials
-  app.enableCors({
-    origin: [
-      'http://localhost:3001',
-      'http://127.0.0.1:3001',
-      'http://localhost:3002',
-      'http://127.0.0.1:3002'
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    exposedHeaders: ['Set-Cookie'],
-  });
+  // app.enableCors({
+  //   origin: [
+  //     'http://localhost:3001',
+  //     'http://127.0.0.1:3001',
+  //     'http://localhost:3002',
+  //     'http://127.0.0.1:3002'
+  //   ],
+  //   credentials: true,
+  //   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  //   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  //   exposedHeaders: ['Set-Cookie'],
+  // });
+// Get allowed origins from env
+const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [
+  'http://localhost:3001',
+  'http://127.0.0.1:3001',
+];
 
+app.enableCors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  exposedHeaders: ['Set-Cookie'],
+});
   // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
